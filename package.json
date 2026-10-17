@@ -1,6 +1,6 @@
 {
   "name": "@intabia-fusion/yama",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Yet another multi-repository manager: monorepo build system and dependency tools",
   "main": "lib/index.js",
   "types": "types/index.d.ts",
@@ -53,7 +53,7 @@
   ],
   "author": "Andrey Sobolev haiodo@gmail.com https://github.com/haiodo",
   "license": "EPL-2.0",
-  "packageManager": "pnpm@10.17.1",
+  "packageManager": "pnpm@12.14.0",
   "engines": {
     "node": ">=20"
   },
