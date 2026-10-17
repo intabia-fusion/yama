@@ -90,8 +90,8 @@ export function collectFileSignatures (dir: string, extensions: Set<string> | nu
       try {
         const stat = fs.lstatSync(fullPath)
         if (!stat.isFile()) continue
-        // Content-based hash: robust across git checkouts that bump mtime.
-        // xxh64 is ~5-10x faster than md5, source files typically <100KB.
+        // Content hash, not mtime: git checkout bumps mtime. xxh64 is ~5-10x faster than md5,
+        // source files typically <100KB.
         const content = fs.readFileSync(fullPath)
         const hash = xxh64(content).toString(16)
         signatures[fullPath] = `${hash}:${stat.size}`
@@ -160,7 +160,7 @@ export function calculatePackageHash (packagePath: string, extraFiles: string[] 
     }
   }
 
-  // Content-hash helper - robust to git checkout mtime bumps.
+  // Content hash, not mtime: git checkout bumps mtime.
   const pushFileSig = (label: string, absPath: string): void => {
     if (!fs.existsSync(absPath)) return
     try {
