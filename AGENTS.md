@@ -1,4 +1,4 @@
-# @haiodo/yama - Yet Another Multi-repository Manager
+# @intabia-fusion/yama - Yet Another Multi-repository Manager
 
 ## Project Overview
 

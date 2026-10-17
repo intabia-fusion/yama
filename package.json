@@ -1,5 +1,5 @@
 {
-  "name": "@intabiafusion/yama",
+  "name": "@intabia-fusion/yama",
   "version": "0.1.0",
   "description": "Yet another multi-repository manager: monorepo build system and dependency tools",
   "main": "lib/index.js",
