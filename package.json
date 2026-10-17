@@ -1,6 +1,6 @@
 {
   "name": "@intabia-fusion/yama",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Yet another multi-repository manager: monorepo build system and dependency tools",
   "main": "lib/index.js",
   "types": "types/index.d.ts",
@@ -90,7 +90,8 @@
   "peerDependencies": {
     "eslint": ">=8.54.0",
     "prettier": ">=3.0.0",
-    "svelte": ">=4.2.0"
+    "svelte": ">=4.2.0",
+    "typescript": "^5.0.0 || ^6.0.0"
   },
   "peerDependenciesMeta": {
     "eslint": {
@@ -100,6 +101,9 @@
       "optional": true
     },
     "svelte": {
+      "optional": true
+    },
+    "typescript": {
       "optional": true
     }
   },
