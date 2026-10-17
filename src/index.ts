@@ -1,5 +1,6 @@
 // By Andrey Sobolev haiodo@gmail.com
-import { resolve } from 'path'
+import { join, resolve } from 'path'
+import { spawnSync } from 'child_process'
 import yargs, { Arguments } from 'yargs'
 import { hideBin } from 'yargs/helpers'
 import { listPackages } from './tools/list.js'
@@ -15,8 +16,13 @@ import {
   findWhereUsed,
   formatWhereUsedResult
 } from './tools/deps.js'
+import { main as compileAllMain } from './build/compile-all.js'
 
-console.log('Hello, Yama!')
+// Raw argv after the command word: compile-all and compile do their own parsing.
+function forwardedArgs (command: string): string[] {
+  const argv = hideBin(process.argv)
+  return argv.slice(argv.indexOf(command) + 1)
+}
 
 yargs(hideBin(process.argv))
   .command('list <root> [mode]', 'and and list all packages in the root directory recursively',
@@ -322,163 +328,28 @@ yargs(hideBin(process.argv))
       }
     }
   )
-  .command('compile <package>', 'Compile a single package (transpile + validate)',
+  .command('compile [mode]', 'Compile the package in the current directory (build, build-ui, ui-esbuild, svelte-dts)',
     (yargs) => {
-      return yargs
-        .positional('package', { describe: 'Package name to compile', type: 'string' })
-        .option('mode', {
-          alias: 'm',
-          describe: 'Compilation mode',
-          choices: ['transpile', 'validate', 'full'] as const,
-          default: 'full'
-        })
-        .option('src-dir', {
-          alias: 's',
-          describe: 'Source directory',
-          type: 'string',
-          default: 'src'
-        })
+      return yargs.positional('mode', { describe: 'Compile mode, passed to the compile bin', type: 'string' })
     },
-    async (argv: Arguments) => {
-      const packageName = argv.package as string
-      const mode = argv.mode as 'transpile' | 'validate' | 'full'
-      const srcDir = argv['src-dir'] as string
-
-      console.log(`Compiling package: ${packageName}`)
-      console.log(`Mode: ${mode}\n`)
-
-      const { compilePackage } = await import('./tools/compile.js')
-      const { findPackage } = await import('./tools/list.js')
-
-      const pkg = await findPackage('.', packageName)
-      if (!pkg) {
-        console.error(`Package "${packageName}" not found`)
-        process.exit(1)
-      }
-
-      const result = await compilePackage(pkg.dir, mode, srcDir)
-
-      if (result.success) {
-        console.log(`✓ Compiled successfully in ${Math.round(result.time * 100) / 100}ms`)
-      } else {
-        console.error('✗ Compilation failed:', result.error?.message)
-        process.exit(1)
-      }
+    () => {
+      const result = spawnSync(process.execPath, [join(__dirname, 'bin/compile.js'), ...forwardedArgs('compile')], {
+        stdio: 'inherit'
+      })
+      process.exit(result.status ?? 1)
     }
   )
-  .command('build <root>', 'Build all packages in dependency order',
-    (yargs) => {
-      return yargs
-        .positional('root', { describe: 'Root directory of the monorepo', default: '.' })
-        .option('parallel', {
-          alias: 'p',
-          describe: 'Number of parallel workers',
-          type: 'number',
-          default: 4
-        })
-        .option('validate', {
-          alias: 'v',
-          describe: 'Also run TypeScript validation',
-          type: 'boolean',
-          default: false
-        })
-        .option('to', {
-          alias: 't',
-          describe: 'Only build the specified package and its dependencies',
-          type: 'string'
-        })
-        .option('no-cache', {
-          describe: 'Clear TypeScript cache before building',
-          type: 'boolean',
-          default: false
-        })
-        .option('list', {
-          alias: 'l',
-          describe: 'Only print the build order without building',
-          type: 'boolean',
-          default: false
-        })
-    },
-    async (argv: Arguments) => {
-      const root = resolve(argv.root as string)
-      const parallel = argv.parallel as number
-      const doValidate = argv.validate as boolean
-      const toPackage = argv.to as string | undefined
-      const noCache = argv['no-cache'] as boolean
-      const list = argv.list as boolean
-
-      console.log(`Building packages in: ${root}`)
-      if (toPackage) {
-        console.log(`Target package: ${toPackage}`)
-      }
-      console.log()
-
-      const { compileAll } = await import('./tools/compile-all.js')
-      const { listPackages } = await import('./tools/list.js')
-
-      const packages = await listPackages(root, 'folder')
-
-      const result = await compileAll(packages, {
-        parallel,
-        doValidate,
-        noCache,
-        list,
-        toPackage: toPackage || null
-      })
-
-      if (!result.success && !list) {
-        process.exit(1)
-      }
+  .command('build [args..]', 'Build all packages in dependency order (compile-all flags are forwarded)',
+    (yargs) => yargs.positional('args', { describe: 'root directory and compile-all flags, see compile-all --help' }),
+    async () => {
+      await compileAllMain(forwardedArgs('build'))
     }
   )
-  .command('validate <root>', 'Validate TypeScript in all packages',
-    (yargs) => {
-      return yargs
-        .positional('root', { describe: 'Root directory of the monorepo', default: '.' })
-        .option('parallel', {
-          alias: 'p',
-          describe: 'Number of parallel workers',
-          type: 'number',
-          default: 4
-        })
-        .option('to', {
-          alias: 't',
-          describe: 'Only validate the specified package and its dependencies',
-          type: 'string'
-        })
-        .option('no-cache', {
-          describe: 'Clear TypeScript cache before validating',
-          type: 'boolean',
-          default: false
-        })
-    },
-    async (argv: Arguments) => {
-      const root = resolve(argv.root as string)
-      const parallel = argv.parallel as number
-      const toPackage = argv.to as string | undefined
-      const noCache = argv['no-cache'] as boolean
-
-      console.log(`Validating packages in: ${root}`)
-      if (toPackage) {
-        console.log(`Target package: ${toPackage}`)
-      }
-      console.log()
-
-      const { compileAll } = await import('./tools/compile-all.js')
-      const { listPackages } = await import('./tools/list.js')
-
-      const packages = await listPackages(root, 'folder')
-
-      const result = await compileAll(packages, {
-        parallel,
-        doValidate: true,
-        noCache,
-        toPackage: toPackage || null
-      })
-
-      if (!result.success) {
-        process.exit(1)
-      }
+  // Type checking is part of the build, so validate is the same command.
+  .command('validate [args..]', 'Alias of build',
+    (yargs) => yargs.positional('args', { describe: 'root directory and compile-all flags, see compile-all --help' }),
+    async () => {
+      await compileAllMain(forwardedArgs('validate'))
     }
   )
   .parse()

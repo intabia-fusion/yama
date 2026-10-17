@@ -1,59 +1,120 @@
 {
-  "name": "@haiodo/yama",
-  "version": "1.0.0",
-  "description": "Yet another multi-repository manager",
+  "name": "@intabiafusion/yama",
+  "version": "0.1.0",
+  "description": "Yet another multi-repository manager: monorepo build system and dependency tools",
   "main": "lib/index.js",
+  "types": "types/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/intabia-fusion/yama.git"
+  },
   "bin": {
-    "yama": "lib/index.js"
+    "yama": "lib/index.js",
+    "compile": "lib/bin/compile.js",
+    "compile-all": "lib/bin/compile-all.js",
+    "watch-all": "lib/bin/watch-all.js",
+    "format": "lib/bin/format.js",
+    "do-svelte-check": "lib/bin/do-svelte-check.js",
+    "check-svelte-imports": "lib/bin/check-svelte-imports.js",
+    "bump-package-version": "lib/bin/bump-package-version.js",
+    "bump-changes-from-tag": "lib/bin/bump-changes-from-tag.js",
+    "update-deps": "lib/bin/update-deps.js",
+    "sync-eslint-deps": "lib/bin/sync-eslint-deps.js",
+    "yama-jest": "lib/bin/jest.js",
+    "yama-test-group": "lib/bin/test-group.js",
+    "yama-coverage": "lib/bin/coverage.js",
+    "yama-stand-coverage": "lib/bin/stand-coverage.js"
+  },
+  "exports": {
+    ".": {
+      "types": "./types/index.d.ts",
+      "default": "./lib/index.js"
+    },
+    "./build/*": {
+      "types": "./types/build/*.d.ts",
+      "default": "./lib/build/*.js"
+    },
+    "./bin/*": "./lib/bin/*.js",
+    "./package.json": "./package.json"
   },
   "scripts": {
     "build": "tsc",
     "lint": "eslint src --fix",
     "do": "pnpm build && node lib/index.js",
     "dod": "pnpm build && node --enable-source-maps --inspect-brk lib/index.js",
-    "test": "vitest run"
+    "test": "pnpm build && vitest run",
+    "prepublishOnly": "pnpm build"
   },
-  "keywords": [],
+  "keywords": [
+    "monorepo",
+    "build",
+    "pnpm",
+    "typescript"
+  ],
   "author": "Andrey Sobolev haiodo@gmail.com https://github.com/haiodo",
   "license": "EPL-2.0",
   "packageManager": "pnpm@10.17.1",
+  "engines": {
+    "node": ">=20"
+  },
   "files": [
     "src",
     "lib",
     "types",
+    "docs",
     "package.json",
     "readme.md"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
-    "@types/globby": "^9.1.0",
-    "@types/jest": "^30.0.0",
+    "@types/istanbul-lib-coverage": "^2.0.6",
+    "@types/istanbul-lib-report": "^3.0.3",
+    "@types/istanbul-reports": "^3.0.4",
     "@types/js-yaml": "^4.0.9",
     "@types/node": "^24.10.0",
     "@types/yargs": "^17.0.34",
-    "esbuild": "^0.25.0",
-    "esbuild-plugin-copy": "^2.1.1",
     "eslint": "^9.39.1",
     "globals": "^16.5.0",
-    "jest": "^30.2.0",
     "jiti": "^2.6.1",
     "neostandard": "^0.12.2",
-    "ts-jest": "^29.4.6",
+    "prettier": "^3.6.2",
+    "svelte": "^4.2.20",
+    "typescript": "^5.9.3",
     "typescript-eslint": "^8.46.3",
-    "tsx": "^4.19.0",
     "vitest": "^4.0.18"
   },
-  "optionalDependencies": {
-    "esbuild-svelte": "^0.9.0",
-    "svelte-preprocess": "^6.0.0",
-    "svelte2tsx": "^0.7.0"
+  "peerDependencies": {
+    "eslint": ">=8.54.0",
+    "prettier": ">=3.0.0",
+    "svelte": ">=4.2.0"
+  },
+  "peerDependenciesMeta": {
+    "eslint": {
+      "optional": true
+    },
+    "prettier": {
+      "optional": true
+    },
+    "svelte": {
+      "optional": true
+    }
   },
   "dependencies": {
-    "esbuild": "^0.25.0",
-    "esbuild-plugin-copy": "^2.1.1",
+    "@node-rs/xxhash": "^1.7.7",
+    "esbuild": "^0.28.2",
+    "esbuild-svelte": "^0.9.5",
     "globby": "^15.0.0",
+    "istanbul-lib-coverage": "^3.2.2",
+    "istanbul-lib-report": "^3.0.1",
+    "istanbul-reports": "^3.2.0",
     "js-yaml": "^4.1.1",
-    "typescript": "^5.9.3",
+    "svelte-preprocess": "^6.0.5",
+    "svelte2tsx": "^0.7.61",
+    "typescript7": "npm:typescript@7.0.2",
+    "v8-to-istanbul": "^9.3.0",
     "yargs": "^18.0.0"
   }
 }
