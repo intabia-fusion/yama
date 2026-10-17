@@ -62,6 +62,7 @@
     "lib",
     "types",
     "docs",
+    "!**/__tests__",
     "package.json",
     "readme.md"
   ],

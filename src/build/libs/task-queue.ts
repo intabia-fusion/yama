@@ -160,6 +160,12 @@ export class BuildTaskQueue {
           return null // Not ready, package not complete
         }
       }
+      // A package without a package phase (pods) copies bundle/ straight into the image.
+      if (this._hasTask(TaskType.BUNDLE, packageName)) {
+        if (!this.bucket(this.completed, TaskType.BUNDLE).has(packageName)) {
+          return null // Not ready, bundle not complete
+        }
+      }
       return dockerDeps
     }
 
