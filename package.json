@@ -1,6 +1,6 @@
 {
   "name": "@intabia-fusion/yama",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Yet another multi-repository manager: monorepo build system and dependency tools",
   "main": "lib/index.js",
   "types": "types/index.d.ts",
@@ -77,23 +77,31 @@
     "@types/js-yaml": "^4.0.9",
     "@types/node": "^24.10.0",
     "@types/yargs": "^17.0.34",
+    "esbuild-svelte": "^0.9.5",
     "eslint": "^9.39.1",
     "globals": "^16.5.0",
     "jiti": "^2.6.1",
     "neostandard": "^0.12.2",
     "prettier": "^3.6.2",
     "svelte": "^4.2.20",
+    "svelte-preprocess": "^6.0.5",
+    "svelte2tsx": "^0.7.61",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.46.3",
     "vitest": "^4.0.18"
   },
   "peerDependencies": {
+    "esbuild-svelte": "^0.9.5",
     "eslint": ">=8.54.0",
     "prettier": ">=3.0.0",
     "svelte": ">=4.2.0",
-    "typescript": "^5.0.0 || ^6.0.0"
+    "svelte-preprocess": "^6.0.5",
+    "svelte2tsx": "^0.7.61"
   },
   "peerDependenciesMeta": {
+    "esbuild-svelte": {
+      "optional": true
+    },
     "eslint": {
       "optional": true
     },
@@ -103,21 +111,21 @@
     "svelte": {
       "optional": true
     },
-    "typescript": {
+    "svelte-preprocess": {
+      "optional": true
+    },
+    "svelte2tsx": {
       "optional": true
     }
   },
   "dependencies": {
     "@node-rs/xxhash": "^1.7.7",
     "esbuild": "^0.28.2",
-    "esbuild-svelte": "^0.9.5",
     "globby": "^15.0.0",
     "istanbul-lib-coverage": "^3.2.2",
     "istanbul-lib-report": "^3.0.1",
     "istanbul-reports": "^3.2.0",
     "js-yaml": "^4.1.1",
-    "svelte-preprocess": "^6.0.5",
-    "svelte2tsx": "^0.7.61",
     "typescript7": "npm:typescript@7.0.2",
     "v8-to-istanbul": "^9.3.0",
     "yargs": "^18.0.0"

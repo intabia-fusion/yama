@@ -17,7 +17,7 @@ Managing dependencies and versions of a multi-repo with rush.js, turbo and pnpm 
 
 - Node.js 20 or newer.
 - A pnpm workspace: `pnpm-workspace.yaml` at the root with a `packages:` list.
-- `eslint`, `prettier` and `svelte` are optional peer dependencies, needed only for the lint, format and Svelte phases. They are resolved from the package being processed first, so a repository keeps its own versions.
+- `eslint`, `prettier`, `svelte`, `svelte2tsx`, `svelte-preprocess` and `esbuild-svelte` are optional peer dependencies, needed only for the lint, format and Svelte phases. The repository keeps its own versions, and the Svelte tools see its `typescript` rather than the TypeScript 7 compiler yama uses for type checking.
 
 ## How a package takes part
 
