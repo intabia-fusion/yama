@@ -138,6 +138,7 @@ Everything that is specific to one repository lives in an optional `yama.config.
 | `bundle.modelPackage` | Package whose `bundle/model.json` feeds `get-model` steps. |
 | `bundle.escapeNonLatin1` | Escapes non-Latin-1 characters in `bundle.js`, so V8 stores the source as one byte per character. |
 | `bundle.external` | Default esbuild externals. |
+| `bundle.defineEnv` | Environment variable names embedded in direct esbuild bundles and included in bundle cache keys. |
 | `docker.namespace` | Prefix for bare image names. |
 | `lint.pluginsPackage` | Package whose `node_modules` ESLint loads plugins from. |
 | `coverage.*` | What `yama-coverage` counts as server code, which package starts test containers, where stand profiles are. |

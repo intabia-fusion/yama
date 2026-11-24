@@ -355,6 +355,10 @@ async function runEsbuildDirect (
   mkdirSync(join(cwd, config.outdir), { recursive: true })
 
   const define: Record<string, string> = {}
+  for (const name of ctx.bundle.defineEnv ?? []) {
+    const value = process.env[name]
+    if (value !== undefined) define[`process.env.${name}`] = JSON.stringify(value)
+  }
   const version = getVersion()
   if (version) {
     define['process.env.VERSION'] = `"${version}"`
@@ -520,9 +524,11 @@ export async function runBundlePhase (
       return { success: true, skipped: true }
     }
 
+    const env = (bundleContext(cwd).bundle.defineEnv ?? []).map((name) => [name, process.env[name] ?? null])
+    const bundleHash = packageHash === undefined ? undefined : `${packageHash}-${createHash('sha256').update(JSON.stringify(env)).digest('hex')}`
     // Check cache using pre-calculated package hash
-    if (!force && packageHash) {
-      if (isPhaseCached(cwd, packageHash, 'bundle', (pkgPath: string) => hasBundleOutput(pkgPath, bundleScript), ['bundle'])) {
+    if (!force && bundleHash) {
+      if (isPhaseCached(cwd, bundleHash, 'bundle', (pkgPath: string) => hasBundleOutput(pkgPath, bundleScript), ['bundle'])) {
         return { success: true, fromCache: true }
       }
     }
@@ -553,8 +559,8 @@ export async function runBundlePhase (
       }
     }
 
-    if (result.success && packageHash) {
-      markPhaseCompleted(cwd, packageHash, 'bundle', null, ['bundle'])
+    if (result.success && bundleHash) {
+      markPhaseCompleted(cwd, bundleHash, 'bundle', null, ['bundle'])
     }
     return result
   }

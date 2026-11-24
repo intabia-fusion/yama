@@ -39,6 +39,8 @@ export interface BundleConfig {
   modelPackage?: string
   // Escape non-Latin-1 chars in bundle.js so V8 keeps the source as 1 byte per char.
   escapeNonLatin1?: boolean
+  // Environment variables embedded as string literals and included in the bundle cache key.
+  defineEnv?: string[]
   // Default esbuild externals for the in-process bundle.
   external?: string[]
 }
