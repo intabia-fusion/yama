@@ -223,7 +223,9 @@ async function runGetModel (cwd: string, bundleScript: string, packageName: stri
   const ctx = bundleContext(cwd)
   // Check cache first based on model hash and package hash
   const currentModelHash = getModelHash(ctx)
-  const currentPkgHash = calculatePackageHash(cwd)
+  const env = (ctx.bundle.defineEnv ?? []).map((name) => [name, process.env[name] ?? null])
+  const pkgHash = calculatePackageHash(cwd)
+  const currentPkgHash = env.length === 0 ? pkgHash : `${pkgHash}-${createHash('sha256').update(JSON.stringify(env)).digest('hex')}`
   const cacheKey = packageName || cwd
 
   const cached = getModelCache.get(cacheKey)
@@ -273,6 +275,10 @@ async function runGetModel (cwd: string, bundleScript: string, packageName: stri
         mkdirSync(join(cwd, args.outdir), { recursive: true })
 
         const define: Record<string, string> = {}
+        for (const name of ctx.bundle.defineEnv ?? []) {
+          const value = process.env[name]
+          if (value !== undefined) define[`process.env.${name}`] = JSON.stringify(value)
+        }
         const version = getVersion()
         if (version) {
           define['process.env.VERSION'] = `"${version}"`
@@ -525,7 +531,9 @@ export async function runBundlePhase (
     }
 
     const env = (bundleContext(cwd).bundle.defineEnv ?? []).map((name) => [name, process.env[name] ?? null])
-    const bundleHash = packageHash === undefined ? undefined : `${packageHash}-${createHash('sha256').update(JSON.stringify(env)).digest('hex')}`
+    const bundleHash = packageHash === undefined || env.length === 0
+      ? packageHash
+      : `${packageHash}-${createHash('sha256').update(JSON.stringify(env)).digest('hex')}`
     // Check cache using pre-calculated package hash
     if (!force && bundleHash) {
       if (isPhaseCached(cwd, bundleHash, 'bundle', (pkgPath: string) => hasBundleOutput(pkgPath, bundleScript), ['bundle'])) {

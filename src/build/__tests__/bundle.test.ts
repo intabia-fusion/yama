@@ -51,6 +51,11 @@ describe('bundle environment', () => {
       expect(second.cacheHits).toBe(0)
       expect(readFileSync(join(cwd, 'bundle/bundle.js'), 'utf8')).toContain('second-key')
       expect(hashBundleDir(cwd)).not.toBe(imageHash)
+      delete process.env.YAMA_TEST_PUBLIC_KEY
+      const unset = await runBundlePhase(graph, ['test-account'], 1, { packageHash: 'same-source' })
+      expect(unset.errors).toEqual([])
+      expect(unset.cacheHits).toBe(0)
+      expect(readFileSync(join(cwd, 'bundle/bundle.js'), 'utf8')).toContain('process.env.YAMA_TEST_PUBLIC_KEY')
     } finally {
       delete process.env.YAMA_TEST_PUBLIC_KEY
       delete process.env.YAMA_TEST_SECRET
